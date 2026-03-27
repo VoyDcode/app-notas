@@ -44,4 +44,4 @@ Este aplicativo foi desenvolvido em **React Native** com **Firebase Authenticati
 
 ## 📹 Vídeo de Demonstração
 
-*Link:*
+*Link: https://drive.google.com/drive/folders/15p-Otjr5yadK_yDTh8YDkn6IZEDRy5wM?usp=sharing*
