@@ -1,23 +1,33 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import {
+  initializeAuth,
+  getReactNativePersistence,
+  getAuth,
+} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// TODO: Adicione as chaves do seu projeto Firebase aqui
-// Vá em Configurações do Projeto no Firebase Console e copie o objeto firebaseConfig
 const firebaseConfig = {
-  apiKey: "[GCP_API_KEY]",
-  authDomain: "app-de-notas-17113.firebaseapp.com",
-  projectId: "app-de-notas-17113",
-  storageBucket: "app-de-notas-17113.firebasestorage.app",
-  messagingSenderId: "1054355676379",
-  appId: "1:1054355676379:web:a18c88727210974f616819"
+  apiKey: "AIzaSyD5VsOscNzUQu1xB3GOYJb4tT9G_caY5p0",
+  authDomain: "appnotas-6644b.firebaseapp.com",
+  projectId: "appnotas-6644b",
+  storageBucket: "appnotas-6644b.firebasestorage.app",
+  messagingSenderId: "646933545078",
+  appId: "1:646933545078:web:3f0e30d878c748e06fdf57"
 };
 
-// Inicializar o Firebase
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Obter as instâncias de Auth e Firestore
-const auth = getAuth(app);
+let auth;
+
+try {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  });
+} catch (e) {
+  auth = getAuth(app);
+}
+
 const db = getFirestore(app);
 
 export { auth, db };

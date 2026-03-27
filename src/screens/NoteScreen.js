@@ -15,13 +15,13 @@ import {
   addDoc, 
   updateDoc, 
   doc, 
-  serverTimestamp 
+  serverTimestamp,
+  Timestamp
 } from 'firebase/firestore';
 
 export default function NoteScreen({ route, navigation }) {
   const { user } = useContext(AuthContext);
-  
-  // Se route.params.note existir, estamos em modo de EDIÇÃO
+
   const existingNote = route.params?.note || null;
 
   const [title, setTitle] = useState(existingNote ? existingNote.title : '');
@@ -41,29 +41,29 @@ export default function NoteScreen({ route, navigation }) {
     }
 
     setSaving(true);
+
     try {
       if (existingNote) {
-        // Atualizar nota existente
         const noteRef = doc(db, 'notes', existingNote.id);
+
         await updateDoc(noteRef, {
-          title,
-          description,
+          title: title.trim(),
+          description: description.trim(),
           updatedAt: serverTimestamp()
         });
       } else {
-        // Criar nova nota
         await addDoc(collection(db, 'notes'), {
-          title,
-          description,
+          title: title.trim(),
+          description: description.trim(),
           userId: user.uid,
-          createdAt: serverTimestamp(),
+          createdAt: Timestamp.now(),
           updatedAt: serverTimestamp()
         });
       }
-      // Voltar para a Home após salvar
+
       navigation.goBack();
     } catch (error) {
-      console.error(error);
+      console.error('ERRO AO SALVAR NOTA:', error);
       Alert.alert('Erro', 'Falha ao salvar a nota. Tente novamente.');
     } finally {
       setSaving(false);
@@ -79,7 +79,7 @@ export default function NoteScreen({ route, navigation }) {
         onChangeText={setTitle}
         maxLength={100}
       />
-      
+
       <TextInput
         style={styles.descriptionInput}
         placeholder="Digite o conteúdo da sua nota..."
@@ -90,14 +90,16 @@ export default function NoteScreen({ route, navigation }) {
       />
 
       <TouchableOpacity 
-        style={styles.saveButton} 
+        style={[styles.saveButton, saving && styles.saveButtonDisabled]} 
         onPress={handleSave}
         disabled={saving}
       >
         {saving ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.saveButtonText}>Salvar Nota</Text>
+          <Text style={styles.saveButtonText}>
+            {existingNote ? 'Atualizar Nota' : 'Salvar Nota'}
+          </Text>
         )}
       </TouchableOpacity>
     </View>
@@ -130,6 +132,9 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: 'center',
     marginTop: 20,
+  },
+  saveButtonDisabled: {
+    opacity: 0.7,
   },
   saveButtonText: {
     color: '#fff',
